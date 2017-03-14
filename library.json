@@ -1,0 +1,34 @@
+{
+  "name": "MakestroCloudClient",
+  "version": "0.1.0",
+  "frameworks": "arduino",
+  "platforms": "esp8266, espectro",
+  "keywords": "makestro, makestrocloud, cloud, mqtt",
+  "description": "Client for cloud.makestro.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dycodex/MakestroCloudClient.git"
+  },
+  "authors": [
+    {
+      "name": "Andri Yadi",
+      "email": "an.dri@me.com"
+    },
+    {
+      "name": "Alwin Arrasyid",
+      "email": "winter@dycode.com",
+      "maintainer": true
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "AsyncMqttClient"
+    },
+    {
+      "name": "ESPAsyncTCP"
+    },
+    {
+      "name": "ArduinoJson"
+    }
+  ]
+}
