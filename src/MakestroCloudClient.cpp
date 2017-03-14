@@ -70,7 +70,7 @@ void MakestroCloudClient::subscribePropertyWithTopic(String topic, String proper
     project.replace(" ", "");
     String newTopic = String(userName) + "/" + project + "/" + topic;
 
-    AsyncMqttClient::subscribe(topic.c_str(), MAKESTROCLOUD_DEFAULT_SUBSCRIBE_QOS);
+    AsyncMqttClient::subscribe(newTopic.c_str(), MAKESTROCLOUD_DEFAULT_SUBSCRIBE_QOS);
   }
 
   subscribedProperties[property] = callback;
