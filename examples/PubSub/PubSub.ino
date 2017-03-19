@@ -7,6 +7,7 @@
 #define WIFI_SSID "AccessPointName"
 #define WIFI_PASS "AccessPointPassword"
 
+ESPectro board(ESPectro_V3);
 DCX_WifiManager wifiManager(AppSetting);
 MakestroCloudClient makestroClient("YOUR_USERNAME", "YOUR_CONNECTION_TOKEN", "YOUR_PROJECT_NAME", "YOUR_DEVICE_ID");
 
@@ -88,7 +89,7 @@ void loop() {
       payload = payload + "}";
 
       // makestroClient.publishData("{\"counter\": " + String(counter) + "}")
-      makestroClient.publishKeyValue("counter", counter);
+      makestroClient.publishData(payload);
       counter++;
     }
   }
