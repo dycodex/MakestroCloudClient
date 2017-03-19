@@ -1,9 +1,13 @@
 #include <MakestroCloudClient.h>
 #include <ESP8266WiFi.h>
+#include <ESPectro.h>
+#include <DCX_AppSetting.h>
+#include <DCX_WifiManager.h>
 
 #define WIFI_SSID "AccessPointName"
 #define WIFI_PASS "AccessPointPassword"
 
+DCX_WifiManager wifiManager(AppSetting);
 MakestroCloudClient makestroClient("YOUR_USERNAME", "YOUR_CONNECTION_TOKEN", "YOUR_PROJECT_NAME", "YOUR_DEVICE_ID");
 
 void onSubscribedPropertyCallback(const String prop, const String value) {
@@ -12,11 +16,18 @@ void onSubscribedPropertyCallback(const String prop, const String value) {
   Serial.print(" = ");
   Serial.print(value);
   Serial.println();
+
+  if (prop.equals("switch")) {
+    if (value.equals("1")) {
+      board.turnOnLED();
+    } else {
+      board.turnOffLED();
+    }
+  }
 }
 
 void onMakestroConnected(bool sessionPresent) {
   Serial.println("Connected to Makestro Cloud!");
-
   makestroClient.subscribeProperty("switch", onSubscribedPropertyCallback);
 }
 
@@ -31,25 +42,54 @@ void onSubscribeAck(uint16_t packetId, uint8_t qos) {
 
 void setup() {
   Serial.begin(9600);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  while (!Serial);
 
-  Serial.println("Waiting for connection....");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
+  DEBUG_SERIAL("\r\nInitializing....\r\n\r\n");
+  AppSetting.load();
+  AppSetting.debugPrintTo(Serial);
 
-  Serial.println("\nConnected to WiFi!");
-  makestroClient.onConnect(onMakestroConnected);
-  makestroClient.onDisconnect(onMakestroDisconnected);
-  makestroClient.onSubscribe(onSubscribeAck);
-  makestroClient.connect();
+  wifiManager.onWifiConnectStarted([]() {
+    DEBUG_SERIAL("WIFI CONNECING STARTED\r\n");
+    board.turnOnLED();
+  });
+
+  wifiManager.onWifiConnected([](boolean newConn) {
+    DEBUG_SERIAL("WIFI_CONNECTED");
+    board.turnOffLED();
+    makestroClient.onConnect(onMakestroConnected);
+    makestroClient.onDisconnect(onMakestroDisconnected);
+    makestroClient.onSubscribe(onSubscribeAck);
+    makestroClient.connect();
+  });
+
+  wifiManager.onWifiConnecting([](unsigned long elapsed) {
+    board.toggleLED();
+  });
+
+  wifiManager.onWifiDisconnected([](WiFiDisconnectReason reason) {
+    DEBUG_SERIAL("WIFI GIVE UP\r\n");
+    board.turnOffLED();
+  });
+
+  wifiManager.begin(WIFI_SSID, WIFI_PASS);
 }
 
 void loop() {
-  if (WiFi.status() == WL_CONNECTED && makestroClient.connected()) {
-    makestroClient.publishData("{\"temp\": 28}");
-    delay(5000);
+  wifiManager.loop();
+
+  static uint16_t counter = 0;
+  static unsigned long lastPublished = 0;
+
+  if (makestroClient.connected()) {
+    if (millis() - lastPublished > 2000) {
+      lastPublished = millis();
+      String payload = "{\"counter\":";
+      payload = payload + String(counter);
+      payload = payload + "}";
+
+      // makestroClient.publishData("{\"counter\": " + String(counter) + "}")
+      makestroClient.publishData(payload);
+      counter++;
+    }
   }
 }
