@@ -1,6 +1,6 @@
 {
   "name": "MakestroCloudClient",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "frameworks": "arduino",
   "platforms": "espressif8266",
   "keywords": "makestro, makestrocloud, cloud, mqtt",
