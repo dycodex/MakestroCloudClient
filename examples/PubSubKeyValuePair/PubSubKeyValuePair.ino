@@ -76,7 +76,7 @@ void setup() {
 }
 
 void loop() {
-  wifiManager.loop();
+  wifiManager.run();
 
   static uint16_t counter = 0;
   static unsigned long lastPublished = 0;
