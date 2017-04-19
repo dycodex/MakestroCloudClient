@@ -5,7 +5,7 @@ MakestroCloudClient::MakestroCloudClient(const char* username, const char* key, 
 
     deviceId = (char*)malloc(sizeof(char*) * MAKESTROCLOUD_DEVICE_ID_MAX_LENGTH);
     if (!clientId) {
-      sprintf(deviceId, "%s-%s-default", userKey, projectName);
+      sprintf(deviceId, "%s-%s-default", userName, projectName);
     } else {
       strcpy(deviceId, clientId);
     }
